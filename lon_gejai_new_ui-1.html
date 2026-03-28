@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lon Gejai</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #17212b;
+  --bg-secondary: #232e3c;
+  --bg-tertiary: #1c2733;
+  --bg-input: #17212b;
+  --accent: #2b9fda;
+  --accent-hover: #3aafe9;
+  --accent-light: rgba(43,159,218,0.15);
+  --text-primary: #e8eaed;
+  --text-secondary: #8a9ab5;
+  --text-muted: #5a6a7e;
+  --bubble-out: #2b5278;
+  --bubble-in: #232e3c;
+  --border: rgba(255,255,255,0.05);
+  --online: #4fba74;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── AUTH ─── */
+#authScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 24px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(43,159,218,0.12) 0%, transparent 60%), var(--bg-primary);
+}
+
+.auth-logo {
+  width: 88px; height: 88px;
+  background: linear-gradient(135deg, #2b9fda, #1a78b0);
+  border-radius: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 40px rgba(43,159,218,0.35);
+  animation: logoIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes logoIn {
+  from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.auth-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+
+.auth-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(43,159,218,0.4);
+}
+
+.auth-form { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+
+.input-group { position: relative; }
+
+.input-group input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px 14px 46px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus { border-color: var(--accent); }
+.input-group input::placeholder { color: var(--text-muted); }
+
+.input-group .i-icon {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.btn-auth {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #2b9fda, #1a78b0);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  box-shadow: 0 6px 20px rgba(43,159,218,0.4);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-auth:active { transform: scale(0.98); }
+
+.btn-auth::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-auth:hover::after { opacity: 1; }
+
+.auth-error {
+  background: rgba(229,57,53,0.12);
+  border: 1px solid rgba(229,57,53,0.3);
+  color: #ff6b6b;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: none;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* ─── MAIN APP ─── */
+#appScreen {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--bg-secondary);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.topbar-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2b9fda, #1a78b0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.online-dot {
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 10px; height: 10px;
+  background: var(--online);
+  border-radius: 50%;
+  border: 2px solid var(--bg-secondary);
+}
+
+.topbar-info { flex: 1; min-width: 0; }
+.topbar-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.topbar-status { font-size: 12px; color: var(--accent); margin-top: 1px; }
+
+.topbar-actions { display: flex; gap: 4px; }
+
+.tb-btn {
+  width: 36px; height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+
+.tb-btn:hover { background: var(--accent-light); color: var(--accent); }
+
+/* MESSAGES */
+.messages-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-primary);
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(43,159,218,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(43,159,218,0.04) 0%, transparent 40%);
+}
+
+.messages-wrap::-webkit-scrollbar { width: 4px; }
+.messages-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+.msg-row {
+  display: flex;
+  flex-direction: column;
+  animation: msgIn 0.2s ease;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.msg-row.out { align-items: flex-end; }
+.msg-row.in { align-items: flex-start; }
+
+.msg-sender {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 3px;
+  padding: 0 4px;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 8px 12px 6px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  position: relative;
+  word-break: break-word;
+}
+
+.msg-row.out .bubble {
+  background: var(--bubble-out);
+  border-bottom-right-radius: 4px;
+  color: #e8eaed;
+}
+
+.msg-row.in .bubble {
+  background: var(--bubble-in);
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.bubble-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  justify-content: flex-end;
+}
+
+.bubble-time { font-size: 11px; color: rgba(255,255,255,0.45); }
+.bubble-check { font-size: 12px; color: #4fba74; }
+
+.date-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.date-divider::before, .date-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.date-label {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* TYPING */
+.typing-bubble {
+  display: none;
+  padding: 10px 14px;
+  background: var(--bubble-in);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  gap: 4px;
+  animation: msgIn 0.2s ease;
+}
+
+.typing-bubble.show { display: flex; }
+
+.typing-dot {
+  width: 7px; height: 7px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); background: var(--text-muted); }
+  30% { transform: translateY(-5px); background: var(--accent); }
+}
+
+/* INPUT BAR */
+.input-bar {
+  background: var(--bg-secondary);
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.msg-input-wrap {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  transition: border-color 0.2s;
+  min-height: 44px;
+}
+
+.msg-input-wrap:focus-within { border-color: rgba(43,159,218,0.4); }
+
+#msgInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 0;
+  resize: none;
+  max-height: 100px;
+  line-height: 1.5;
+}
+
+#msgInput::placeholder { color: var(--text-muted); }
+
+.emoji-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.emoji-btn:hover { opacity: 1; }
+
+.send-btn {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #2b9fda, #1a78b0);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(43,159,218,0.4);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.send-btn:active { transform: scale(0.92); }
+
+/* EMPTY STATE */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+.empty-icon { font-size: 56px; opacity: 0.4; }
+.empty-text { font-size: 15px; text-align: center; line-height: 1.6; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(43,159,218,0.9);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* LOADING */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg-primary);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 1000;
+  transition: opacity 0.4s;
+}
+
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--text-muted); }
+
+/* USER INFO BAR */
+.user-bar {
+  background: var(--bg-tertiary);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.user-bar-info { font-size: 12px; color: var(--text-muted); }
+.user-bar-info span { color: var(--accent); font-weight: 500; }
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div style="font-size:48px;">💬</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">লোড হচ্ছে...</div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-logo">✈️</div>
+  <div class="auth-title">Lon Gejai</div>
+  <div class="auth-sub">আপনার পরিচিতদের সাথে যোগাযোগ করুন</div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchTab('login')">লগইন</button>
+    <button class="auth-tab" onclick="switchTab('signup')">নতুন অ্যাকাউন্ট</button>
+  </div>
+
+  <div class="auth-form">
+    <div class="input-group">
+      <span class="i-icon">✉️</span>
+      <input type="email" id="emailInput" placeholder="ইমেইল ঠিকানা">
+    </div>
+    <div class="input-group">
+      <span class="i-icon">🔒</span>
+      <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড" onkeydown="if(event.key==='Enter') handleAuth()">
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <button class="btn-auth" id="authBtn" onclick="handleAuth()">লগইন করুন</button>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen">
+  <div class="topbar">
+    <div class="topbar-avatar" id="topAvatar">
+      ল
+      <div class="online-dot"></div>
+    </div>
+    <div class="topbar-info">
+      <div class="topbar-name">Lon Gejai চ্যাট</div>
+      <div class="topbar-status" id="onlineCount">সংযুক্ত হচ্ছে...</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="tb-btn" title="সার্চ">🔍</button>
+      <button class="tb-btn" title="মেনু">⋮</button>
+    </div>
+  </div>
+
+  <div class="user-bar">
+    <div class="user-bar-info">লগইন: <span id="currentUserEmail"></span></div>
+    <button class="logout-btn" onclick="handleLogout()">লগআউট</button>
+  </div>
+
+  <div class="messages-wrap" id="messagesWrap">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">💬</div>
+      <div class="empty-text">এখনো কোনো মেসেজ নেই।<br>প্রথম মেসেজ পাঠান!</div>
+    </div>
+    <div class="typing-bubble" id="typingBubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="msg-input-wrap">
+      <button class="emoji-btn">😊</button>
+      <textarea id="msgInput" placeholder="মেসেজ লিখুন..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+        oninput="autoResize(this)"></textarea>
+    </div>
+    <button class="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ⚠️ আপনার Firebase Config এখানে বসান
+const firebaseConfig = {
+  apiKey: "আপনার_API_KEY",
+  authDomain: "আপনার_PROJECT.firebaseapp.com",
+  projectId: "আপনার_PROJECT_ID",
+  storageBucket: "আপনার_PROJECT.appspot.com",
+  messagingSenderId: "আপনার_SENDER_ID",
+  appId: "আপনার_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const colRef = collection(db, "messages");
+
+let currentUser = null;
+let isLoginMode = true;
+let unsubscribe = null;
+
+// Hide loading
+setTimeout(() => {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.style.display = 'none', 400);
+}, 800);
+
+// Auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    showApp(user);
+    loadMessages();
+  } else {
+    currentUser = null;
+    showAuth();
+  }
+});
+
+function showApp(user) {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'flex';
+  const email = user.email || '';
+  document.getElementById('currentUserEmail').textContent = email;
+  const initial = email[0]?.toUpperCase() || 'ব';
+  document.getElementById('topAvatar').innerHTML = initial + '<div class="online-dot"></div>';
+  document.getElementById('onlineCount').textContent = '● অনলাইন';
+}
+
+function showAuth() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+}
+
+// Tab switch
+window.switchTab = (mode) => {
+  isLoginMode = mode === 'login';
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === (isLoginMode ? 0 : 1));
+  });
+  document.getElementById('authBtn').textContent = isLoginMode ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন';
+  document.getElementById('authError').style.display = 'none';
+};
+
+// Handle auth
+window.handleAuth = async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+  const errEl = document.getElementById('authError');
+  const btn = document.getElementById('authBtn');
+
+  if (!email || !password) {
+    showError('ইমেইল ও পাসওয়ার্ড দিন');
+    return;
+  }
+
+  btn.textContent = '⏳ অপেক্ষা করুন...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    if (isLoginMode) {
+      await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, password);
+    }
+  } catch (e) {
+    const msgs = {
+      'auth/user-not-found': 'এই ইমেইলে অ্যাকাউন্ট নেই',
+      'auth/wrong-password': 'পাসওয়ার্ড ভুল হয়েছে',
+      'auth/email-already-in-use': 'এই ইমেইল আগেই ব্যবহার হয়েছে',
+      'auth/weak-password': 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর দিন',
+      'auth/invalid-email': 'ইমেইল ঠিকানা সঠিক নয়',
+      'auth/invalid-credential': 'ইমেইল বা পাসওয়ার্ড ভুল',
+    };
+    showError(msgs[e.code] || 'সমস্যা হয়েছে, আবার চেষ্টা করুন');
+  } finally {
+    btn.textContent = isLoginMode ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন';
+    btn.disabled = false;
+  }
+};
+
+function showError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Logout
+window.handleLogout = async () => {
+  await signOut(auth);
+  showToast('লগআউট হয়েছে');
+};
+
+// Load messages
+function loadMessages() {
+  const q = query(colRef, orderBy('createdAt'));
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    const wrap = document.getElementById('messagesWrap');
+    const typing = document.getElementById('typingBubble');
+    const empty = document.getElementById('emptyState');
+
+    // Clear existing messages (keep typing bubble)
+    Array.from(wrap.children).forEach(child => {
+      if (child !== typing && child !== empty) child.remove();
+    });
+
+    if (snapshot.empty) {
+      empty.style.display = 'flex';
+    } else {
+      empty.style.display = 'none';
+      let lastDate = '';
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const isMe = data.uid === currentUser?.uid;
+        const time = data.createdAt?.toDate();
+        const timeStr = time ? `${time.getHours()}:${String(time.getMinutes()).padStart(2,'0')}` : '';
+        const dateStr = time ? time.toLocaleDateString('bn-BD') : '';
+
+        if (dateStr && dateStr !== lastDate) {
+          const div = document.createElement('div');
+          div.className = 'date-divider';
+          div.innerHTML = `<span class="date-label">আজ</span>`;
+          wrap.insertBefore(div, typing);
+          lastDate = dateStr;
+        }
+
+        const row = document.createElement('div');
+        row.className = `msg-row ${isMe ? 'out' : 'in'}`;
+
+        if (!isMe) {
+          const sender = document.createElement('div');
+          sender.className = 'msg-sender';
+          sender.textContent = data.email?.split('@')[0] || 'অজানা';
+          row.appendChild(sender);
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = `
+          ${escapeHtml(data.text)}
+          <div class="bubble-meta">
+            <span class="bubble-time">${timeStr}</span>
+            ${isMe ? '<span class="bubble-check">✓✓</span>' : ''}
+          </div>
+        `;
+        row.appendChild(bubble);
+        wrap.insertBefore(row, typing);
+      });
+    }
+
+    wrap.scrollTop = wrap.scrollHeight;
+  });
+}
+
+// Send message
+window.sendMessage = async () => {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !currentUser) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Show typing simulation
+  const typing = document.getElementById('typingBubble');
+
+  try {
+    await addDoc(colRef, {
+      text,
+      uid: currentUser.uid,
+      email: currentUser.email,
+      createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    showToast('মেসেজ পাঠানো যায়নি');
+  }
+};
+
+// Helpers
+window.autoResize = (el) => {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+};
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+window.showToast = (msg) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+};
+</script>
+</body>
+</html>
